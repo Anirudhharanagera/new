@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import torch
 from transformers import BertTokenizer, BertForQuestionAnswering, BartTokenizer, BartForConditionalGeneration
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # ---- Load Pre-trained Models ---- #
 @st.cache_resource
