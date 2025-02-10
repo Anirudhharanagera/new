@@ -5,3 +5,4 @@ torchaudio
 transformers
 pandas
 datasets
+pymupdf
