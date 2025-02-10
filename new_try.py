@@ -3,7 +3,6 @@ import pandas as pd
 import torch
 from transformers import BertTokenizer, BertForQuestionAnswering, BartTokenizer, BartForConditionalGeneration
 
-
 # ---- Load Pre-trained Models ---- #
 @st.cache_resource
 def load_models():
@@ -36,8 +35,12 @@ task_choice = st.sidebar.selectbox("Select Task", ("Question Answering", "Docume
 if task_choice == "Question Answering":
     st.subheader("🤔 Question Answering Task")
     
-    # User selects a paragraph from the SQuAD dataset
-    selected_paragraph = st.selectbox("Select a paragraph:", squad_df["context"].unique())
+    input_method = st.radio("Choose input method:", ("Select from Dataset", "Enter Manually"))
+    
+    if input_method == "Select from Dataset":
+        selected_paragraph = st.selectbox("Select a paragraph:", squad_df["context"].unique())
+    else:
+        selected_paragraph = st.text_area("Enter your paragraph:")
     
     # Display selected paragraph
     st.write("### Selected Paragraph:")
@@ -47,7 +50,7 @@ if task_choice == "Question Answering":
     user_question = st.text_input("Enter your question:")
 
     if st.button("Get Answer"):
-        if user_question:
+        if user_question and selected_paragraph:
             inputs = qa_tokenizer(user_question, selected_paragraph, return_tensors="pt", truncation=True)
             
             with torch.no_grad():
@@ -62,7 +65,7 @@ if task_choice == "Question Answering":
 
             st.write(f"### 🏆 Predicted Answer: {answer}")
         else:
-            st.warning("⚠️ Please enter a question.")
+            st.warning("⚠️ Please enter a question and a paragraph.")
 
 # ---- Document Summarization Task ---- #
 elif task_choice == "Document Summarization":
