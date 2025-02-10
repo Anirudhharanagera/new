@@ -14,50 +14,69 @@ model = load_model()
 
 # Streamlit UI
 st.title("NLP Model Deployment")
-st.write("This app processes cleaned SQuAD & CNN/DailyMail datasets and makes predictions using the trained model.")
+st.write("This app allows users to perform Question Answering and Document Summarization using the trained model.")
 
 # Load cleaned datasets
 @st.cache_data
 def load_cleaned_datasets():
     squad_df = pd.read_csv("cleaned_squad.csv")
-    cnn_df = pd.read_csv("cleaned_cnn_dailymail.csv")
+    cnn_df = pd.read_csv("cleaned_cnn.csv")
     return squad_df, cnn_df
 
 squad_df, cnn_df = load_cleaned_datasets()
 
-# Sidebar - Dataset selection
-dataset_choice = st.sidebar.selectbox("Select Dataset", ("SQuAD", "CNN/DailyMail"))
+# Sidebar - Task selection
+task_choice = st.sidebar.selectbox("Select Task", ("Question Answering", "Document Summarization"))
 
-if dataset_choice == "SQuAD":
-    st.subheader("SQuAD Dataset Sample")
-    st.write(squad_df.sample(5))
+if task_choice == "Question Answering":
+    st.subheader("Question Answering Task")
     
-    # User input for prediction
-    user_question = st.text_input("Enter a question:")
-    user_context = st.text_area("Enter the context:")
+    # User selects a paragraph from the SQuAD dataset
+    selected_paragraph = st.selectbox("Select a paragraph:", squad_df["context"].unique())
     
-    if st.button("Predict Answer"):
-        if user_question and user_context:
-            input_data = pd.DataFrame({"question": [user_question], "context": [user_context]})
+    # Display selected paragraph
+    st.write("### Selected Paragraph:")
+    st.write(selected_paragraph)
+    
+    # User inputs question
+    user_question = st.text_input("Enter your question:")
+    
+    if st.button("Get Answer"):
+        if user_question:
+            input_data = pd.DataFrame({"question": [user_question], "context": [selected_paragraph]})
             prediction = model.predict(input_data)
             st.write(f"Predicted Answer: {prediction[0]}")
         else:
-            st.warning("Please enter both question and context.")
+            st.warning("Please enter a question.")
 
-elif dataset_choice == "CNN/DailyMail":
-    st.subheader("CNN/DailyMail Dataset Sample")
-    st.write(cnn_df.sample(5))
+elif task_choice == "Document Summarization":
+    st.subheader("Document Summarization Task")
     
-    # User input for summarization
-    user_article = st.text_area("Enter an article for summarization:")
+    # User selects how to provide input
+    input_option = st.radio("Choose input method:", ("Select from Dataset", "Enter Manually"))
     
-    if st.button("Generate Summary"):
-        if user_article:
-            input_data = pd.DataFrame({"article": [user_article]})
+    if input_option == "Select from Dataset":
+        selected_article = st.selectbox("Select a paragraph:", cnn_df["article"].unique())
+        
+        # Display selected paragraph
+        st.write("### Selected Paragraph:")
+        st.write(selected_article)
+        
+        if st.button("Summarize"):
+            input_data = pd.DataFrame({"article": [selected_article]})
             summary = model.predict(input_data)
             st.write(f"Generated Summary: {summary[0]}")
-        else:
-            st.warning("Please enter an article.")
+    
+    elif input_option == "Enter Manually":
+        user_text = st.text_area("Enter your text:")
+        
+        if st.button("Summarize"):
+            if user_text:
+                input_data = pd.DataFrame({"article": [user_text]})
+                summary = model.predict(input_data)
+                st.write(f"Generated Summary: {summary[0]}")
+            else:
+                st.warning("Please enter text to summarize.")
 
 st.write("---")
 st.write("Developed with ❤️ using Streamlit")
