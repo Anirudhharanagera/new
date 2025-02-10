@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import torch
 from transformers import BertTokenizer, BertForQuestionAnswering, BartTokenizer, BartForConditionalGeneration, pipeline
-import fitz  # PyMuPDF for PDF procesig
+import fitz  # PyMuPDF for PD procesig
 
 # ---- Load Pre-trained Models ---- #
 @st.cache_resource
