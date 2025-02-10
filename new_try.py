@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import torch
 from transformers import BertTokenizer, BertForQuestionAnswering, BartTokenizer, BartForConditionalGeneration, pipeline
-import fitz  # PyMuPDF for PD procesig
+import fitz  # PyMuPDF for PDF processing
 
 # ---- Load Pre-trained Models ---- #
 @st.cache_resource
@@ -11,7 +11,7 @@ def load_models():
     qa_tokenizer = BertTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
     summarization_model = BartForConditionalGeneration.from_pretrained("facebook/bart-large-cnn")
     summarization_tokenizer = BartTokenizer.from_pretrained("facebook/bart-large-cnn")
-    ner_pipeline = pipeline("ner", model="dbmdz/bert-large-cased-finetuned-conll03-english")
+    ner_pipeline = pipeline("ner", model="dbmdz/bert-large-cased-finetuned-conll03-english", aggregation_strategy="simple")
     
     return qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline
 
@@ -117,8 +117,13 @@ elif task_choice == "Named Entity Recognition":
     if st.button("Analyze"):
         if user_text:
             ner_results = ner_pipeline(user_text)
-            for entity in ner_results:
-                st.write(f"**Entity:** {entity['word']} | **Type:** {entity['entity']} | **Confidence:** {entity['score']:.2f}")
+            filtered_entities = [e for e in ner_results if e['entity_group'] in ['PER', 'ORG', 'LOC', 'MISC']]
+            
+            if filtered_entities:
+                for entity in filtered_entities:
+                    st.write(f"**Entity:** {entity['word']} | **Type:** {entity['entity_group']} | **Confidence:** {entity['score']:.2f}")
+            else:
+                st.write("No named entities found.")
         else:
             st.warning("⚠️ Please enter text for analysis.")
 
