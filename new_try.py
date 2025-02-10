@@ -12,10 +12,11 @@ def load_models():
     summarization_model = BartForConditionalGeneration.from_pretrained("facebook/bart-large-cnn")
     summarization_tokenizer = BartTokenizer.from_pretrained("facebook/bart-large-cnn")
     ner_pipeline = pipeline("ner", model="dbmdz/bert-large-cased-finetuned-conll03-english", aggregation_strategy="simple")
+    sentiment_pipeline = pipeline("sentiment-analysis")
     
-    return qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline
+    return qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline, sentiment_pipeline
 
-qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline = load_models()
+qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline, sentiment_pipeline = load_models()
 
 # ---- Load Cleaned Datasets ---- #
 @st.cache_data
@@ -27,11 +28,11 @@ def load_cleaned_datasets():
 squad_df, cnn_df = load_cleaned_datasets()
 
 # ---- Streamlit UI ---- #
-st.title("📖 NLP Model Deployment: Question Answering, Summarization & NER")
-st.write("Perform Question Answering, Document Summarization, and Named Entity Recognition using pre-trained NLP models.")
+st.title("📖 NLP Model Deployment: Question Answering, Summarization, NER & Sentiment Analysis")
+st.write("Perform Question Answering, Document Summarization, Named Entity Recognition, and Sentiment Analysis using pre-trained NLP models.")
 
 # ---- Sidebar for Task Selection ---- #
-task_choice = st.sidebar.selectbox("Select Task", ("Question Answering", "Document Summarization", "Named Entity Recognition"))
+task_choice = st.sidebar.selectbox("Select Task", ("Question Answering", "Document Summarization", "Named Entity Recognition", "Sentiment Analysis"))
 
 # ---- Question Answering Task ---- #
 if task_choice == "Question Answering":
@@ -79,10 +80,6 @@ elif task_choice == "Document Summarization":
     if input_option == "Select from Dataset":
         selected_article = st.selectbox("Select a paragraph:", cnn_df["article"].unique())
         
-        # Display selected paragraph
-        st.write("### Selected Paragraph:")
-        st.write(selected_article)
-        
     elif input_option == "Enter Manually":
         selected_article = st.text_area("Enter your text:")
     
@@ -124,6 +121,20 @@ elif task_choice == "Named Entity Recognition":
                     st.write(f"**Entity:** {entity['word']} | **Type:** {entity['entity_group']} | **Confidence:** {entity['score']:.2f}")
             else:
                 st.write("No named entities found.")
+        else:
+            st.warning("⚠️ Please enter text for analysis.")
+
+# ---- Sentiment Analysis ---- #
+elif task_choice == "Sentiment Analysis":
+    st.subheader("😊 Sentiment Analysis")
+    sentiment_text = st.text_area("Enter text for sentiment analysis:")
+    
+    if st.button("Analyze Sentiment"):
+        if sentiment_text:
+            sentiment_result = sentiment_pipeline(sentiment_text)
+            label = sentiment_result[0]['label']
+            score = sentiment_result[0]['score']
+            st.write(f"**Sentiment:** {label} | **Confidence:** {score:.2f}")
         else:
             st.warning("⚠️ Please enter text for analysis.")
 
