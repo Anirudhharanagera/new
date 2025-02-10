@@ -20,7 +20,7 @@ st.write("This app allows users to perform Question Answering and Document Summa
 @st.cache_data
 def load_cleaned_datasets():
     squad_df = pd.read_csv("cleaned_squad.csv")
-    cnn_df = pd.read_csv("cleaned_cnn.csv")
+    cnn_df = pd.read_csv("cleaned_cnn_dailymail.csv")
     return squad_df, cnn_df
 
 squad_df, cnn_df = load_cleaned_datasets()
