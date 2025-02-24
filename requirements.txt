@@ -6,4 +6,6 @@ transformers
 pandas
 datasets
 pymupdf
+google-cloud-aiplatform
+google-cloud-logging
 
