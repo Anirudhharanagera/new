@@ -28,8 +28,8 @@ def load_cleaned_datasets():
 squad_df, cnn_df = load_cleaned_datasets()
 
 # ---- Streamlit UI ---- #
-st.title("📖 NLP Model Deployment: Question Answering, Summarization, NER & Sentiment Analysis")
-st.write("Perform Question Answering, Document Summarization, Named Entity Recognition, and Sentiment Analysis using pre-trained NLP models.")
+st.title("📖 NLP with Transformer Models: Question Answering, Summarization, NER & Sentiment Analysis")
+st.write("Perform Question Answering, Document Summarization, Named Entity Recognition, and Sentiment Analysis.")
 
 # ---- Sidebar for Task Selection ---- #
 task_choice = st.sidebar.selectbox("Select Task", ("Question Answering", "Document Summarization", "Named Entity Recognition", "Sentiment Analysis"))
@@ -139,4 +139,4 @@ elif task_choice == "Sentiment Analysis":
             st.warning("⚠️ Please enter text for analysis.")
 
 st.write("---")
-st.write("🚀 Developed with ❤️ using Streamlit")
+st.write("................")
