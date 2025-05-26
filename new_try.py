@@ -39,6 +39,7 @@ def load_models():
         summarization_model, summarization_tokenizer,
         ner_pipeline, sentiment_pipeline
     )
+qa_model, qa_tokenizer, summarization_model, summarization_tokenizer, ner_pipeline, sentiment_pipeline = load_models()
 
 
 
